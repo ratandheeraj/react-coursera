@@ -2,11 +2,6 @@ import React, { Component } from "react";
 import { Card, CardImg, CardText, CardTitle, CardBody } from "reactstrap";
 
 class DishDetail extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
   renderDish(dish) {
     if (dish != null) {
       return (
