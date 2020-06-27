@@ -1,5 +1,14 @@
 import React, { Component } from "react";
-import { Card, CardImg, CardText, CardTitle, CardBody } from "reactstrap";
+import {
+  Card,
+  CardImg,
+  CardText,
+  CardTitle,
+  CardBody,
+  Breadcrumb,
+  BreadcrumbItem,
+} from "reactstrap";
+import { Link } from "react-router-dom";
 
 class DishDetail extends Component {
   renderDish(dish) {
@@ -23,7 +32,7 @@ class DishDetail extends Component {
         <div>
           <h4>Comments</h4>
           <ul className="list-unstyled">
-            {dish.comments.map((cmt) => {
+            {dish.map((cmt) => {
               return (
                 <li key="{cmt.id}">
                   <CardText style={{ fontSize: "1.2rem", paddingTop: "3%" }}>
@@ -53,11 +62,29 @@ class DishDetail extends Component {
     return (
       <div className="container">
         <div className="row">
+          <Breadcrumb>
+            <BreadcrumbItem>
+              <Link to="/menu">Menu</Link>
+            </BreadcrumbItem>
+            <BreadcrumbItem active>{this.props.dish.name}</BreadcrumbItem>
+          </Breadcrumb>
+          <div className="col-12">
+            <h3>{this.props.dish.name}</h3>
+            <hr />
+          </div>
+        </div>
+        <div className="row">
           <div className="col-12 col-md-5 m-1">{this.renderDish(dish)}</div>
-          <div className="col-md-5 col-12 m-1">{this.renderComments(dish)}</div>
+          <div className="col-md-5 col-12 m-1">
+            {this.renderComments(this.props.comments)}
+          </div>
         </div>
       </div>
     );
   }
 }
 export default DishDetail;
+
+// <div className="col-12 col-md-5 m-1">
+//   <RenderComments comments={props.comments} />
+// </div>
