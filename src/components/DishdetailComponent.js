@@ -33,8 +33,12 @@ class CommentForm extends Component {
   }
 
   handleSubmit(values) {
-    console.log("Current State is: " + JSON.stringify(values));
-    alert("Current State is: " + JSON.stringify(values));
+    this.props.addComment(
+      this.props.dishId,
+      values.rating,
+      values.author,
+      values.comment
+    );
   }
   render() {
     const required = (val) => val && val.length;
@@ -177,7 +181,10 @@ class DishDetail extends Component {
           <div className="col-12 col-md-5 m-1">{this.renderDish(dish)}</div>
           <div className="col-md-5 col-12 m-1">
             {this.renderComments(this.props.comments)}
-            <CommentForm />
+            <CommentForm
+              addComment={this.props.addComment}
+              dishId={this.props.dish.id}
+            />
           </div>
         </div>
       </div>
