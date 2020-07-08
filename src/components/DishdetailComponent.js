@@ -17,6 +17,7 @@ import { Control, LocalForm, Errors } from "react-redux-form";
 import { Link } from "react-router-dom";
 import { Loading } from "./LoadingComponent";
 import { baseUrl } from "../shared/baseUrl";
+import { FadeTransform, Fade, Stagger } from "react-animation-components";
 
 class CommentForm extends Component {
   constructor(props) {
@@ -35,7 +36,7 @@ class CommentForm extends Component {
   }
 
   handleSubmit(values) {
-    this.props.addComment(
+    this.props.postComment(
       this.props.dishId,
       values.rating,
       values.author,
@@ -120,13 +121,24 @@ class DishDetail extends Component {
   renderDish(dish) {
     if (dish != null) {
       return (
-        <Card key="{dish.id}">
-          <CardImg width="100%" src={baseUrl + dish.image} alt="{dish.name}" />
-          <CardBody>
-            <CardTitle>{dish.name}</CardTitle>
-            <CardText>{dish.description}</CardText>
-          </CardBody>
-        </Card>
+        <FadeTransform
+          in
+          transformProps={{
+            exitTransform: "scale(0.5) translateY(-50%)",
+          }}
+        >
+          <Card key="{dish.id}">
+            <CardImg
+              width="100%"
+              src={baseUrl + dish.image}
+              alt="{dish.name}"
+            />
+            <CardBody>
+              <CardTitle>{dish.name}</CardTitle>
+              <CardText>{dish.description}</CardText>
+            </CardBody>
+          </Card>
+        </FadeTransform>
       );
     } else {
       return <div></div>;
@@ -137,25 +149,31 @@ class DishDetail extends Component {
       return (
         <div>
           <h4>Comments</h4>
-          <ul className="list-unstyled">
-            {dish.map((cmt) => {
-              return (
-                <li key="{cmt.id}">
-                  <CardText style={{ fontSize: "1.2rem", paddingTop: "3%" }}>
-                    {cmt.comment}
-                  </CardText>
-                  <CardText>
-                    --{cmt.author},{" "}
-                    {new Intl.DateTimeFormat("en-US", {
-                      year: "numeric",
-                      month: "short",
-                      day: "2-digit",
-                    }).format(new Date(Date.parse(cmt.date)))}
-                  </CardText>
-                </li>
-              );
-            })}
-          </ul>
+          <Stagger in>
+            <ul className="list-unstyled">
+              {dish.map((cmt) => {
+                return (
+                  <Fade in>
+                    <li key="{cmt.id}">
+                      <CardText
+                        style={{ fontSize: "1.2rem", paddingTop: "3%" }}
+                      >
+                        {cmt.comment}
+                      </CardText>
+                      <CardText>
+                        --{cmt.author},{" "}
+                        {new Intl.DateTimeFormat("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "2-digit",
+                        }).format(new Date(Date.parse(cmt.date)))}
+                      </CardText>
+                    </li>
+                  </Fade>
+                );
+              })}
+            </ul>
+          </Stagger>
         </div>
       );
     } else {
@@ -184,7 +202,7 @@ class DishDetail extends Component {
           <div className="col-md-5 col-12 m-1">
             {this.renderComments(this.props.comments)}
             <CommentForm
-              addComment={this.props.addComment}
+              postComment={this.props.postComment}
               dishId={this.props.dish.id}
             />
           </div>

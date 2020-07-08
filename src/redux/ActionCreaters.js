@@ -2,15 +2,106 @@ import * as ActionTypes from "./ActionTypes";
 import { DISHES } from "../shared/dishes";
 import { baseUrl } from "../shared/baseUrl";
 
-export const addComment = (dishId, rating, author, comment) => ({
+export const addComment = (comment) => ({
   type: ActionTypes.ADD_COMMENT,
-  payload: {
+  payload: comment,
+});
+
+export const postComment = (dishId, rating, author, comment) => (dispatch) => {
+  const newComment = {
     dishId: dishId,
     rating: rating,
     author: author,
     comment: comment,
-  },
-});
+  };
+  newComment.date = new Date().toISOString();
+
+  return fetch(baseUrl + "comments", {
+    method: "POST",
+    body: JSON.stringify(newComment),
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "same-origin",
+  })
+    .then(
+      (response) => {
+        if (response.ok) {
+          return response;
+        } else {
+          var error = new Error(
+            "Error " + response.status + ": " + response.statusText
+          );
+          error.response = response;
+          throw error;
+        }
+      },
+      (error) => {
+        throw error;
+      }
+    )
+    .then((response) => response.json())
+    .then((response) => dispatch(addComment(response)))
+    .catch((error) => {
+      console.log("post comments", error.message);
+      alert("Your comment could not be posted\nError: " + error.message);
+    });
+};
+
+export const addFeedback = (response) => {
+  alert("Thank you for your feedback: " + JSON.stringify(response));
+};
+
+export const postFeedback = (
+  feedbackId,
+  firstname,
+  lastname,
+  telnum,
+  email,
+  agree,
+  contactType,
+  message
+) => (dispatch) => {
+  const newFeedback = {
+    feedbackId: feedbackId,
+    firstname: firstname,
+    lastname: lastname,
+    telnum: telnum,
+    email: email,
+    agree: agree,
+    contactType: contactType,
+    message: message,
+  };
+  return fetch(baseUrl + "feedback", {
+    method: "POST",
+    body: JSON.stringify(newFeedback),
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "same-origin",
+  })
+    .then(
+      (response) => {
+        if (response.ok) {
+          return response;
+        } else {
+          var error = new Error(
+            "Error " + response.status + ": " + response.statusText
+          );
+          error.response = response;
+          throw error;
+        }
+      },
+      (error) => {
+        throw error;
+      }
+    )
+    .then((response) => response.json())
+    .then((response) => dispatch(addFeedback(response)))
+    .catch((error) => {
+      console.log("post feedback", error.message);
+    });
+};
 
 export const fetchDishes = () => (dispatch) => {
   dispatch(dishesLoading(true));
@@ -124,4 +215,44 @@ export const promosFailed = (errmess) => ({
 export const addPromos = (promos) => ({
   type: ActionTypes.ADD_PROMOS,
   payload: promos,
+});
+
+export const fetchLeaders = () => (dispatch) => {
+  dispatch(leadersLoading(true));
+
+  return fetch(baseUrl + "leaders")
+    .then(
+      (response) => {
+        if (response.ok) {
+          return response;
+        } else {
+          var error = new Error(
+            "Error " + response.status + ": " + response.statusText
+          );
+          error.response = response;
+          throw error;
+        }
+      },
+      (error) => {
+        var errmess = new Error(error.message);
+        throw errmess;
+      }
+    )
+    .then((response) => response.json())
+    .then((dishes) => dispatch(addLeaders(dishes)))
+    .catch((error) => dispatch(leadersFailed(error.message)));
+};
+
+export const leadersLoading = () => ({
+  type: ActionTypes.DISHES_LOADING,
+});
+
+export const leadersFailed = (errmess) => ({
+  type: ActionTypes.DISHES_FAILED,
+  payload: errmess,
+});
+
+export const addLeaders = (leaders) => ({
+  type: ActionTypes.ADD_LEADERS,
+  payload: leaders,
 });

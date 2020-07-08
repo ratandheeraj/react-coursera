@@ -8,27 +8,56 @@ import {
   Media,
 } from "reactstrap";
 import { Link } from "react-router-dom";
+import { Loading } from "./LoadingComponent";
+import { baseUrl } from "../shared/baseUrl";
+import { Fade, Stagger } from "react-animation-components";
 
-function RenderLeader(props) {
+function RenderLeader(item) {
   return (
-    <div key={props.id}>
-      <Media tag="li">
-        <Media left top>
-          <Media object src={props.image} alt={props.name} />
+    <Fade in>
+      <div key={item.id}>
+        <Media tag="li">
+          <Media left top>
+            <Media object src={baseUrl + item.image} alt={item.name} />
+          </Media>
+          <Media body className="ml-5">
+            <Media heading>{item.name}</Media>
+            <p>{item.designation}</p>
+            <p>{item.description}</p>
+          </Media>
         </Media>
-        <Media body className="ml-5">
-          <Media heading>{props.name}</Media>
-          <p>{props.designation}</p>
-          <p>{props.description}</p>
-        </Media>
-      </Media>
-    </div>
+      </div>
+    </Fade>
   );
 }
 
 function About(props) {
-  const leaders = props.leaders.map((leader) => {
-    return <div>{RenderLeader(leader)}</div>;
+  const leaders = props.leaders.leaders.map((leader) => {
+    if (props.leaders.isLoading) {
+      return (
+        <div className="container">
+          <div className="row">
+            <Loading />
+          </div>
+        </div>
+      );
+    } else if (props.leaders.errMess) {
+      return (
+        <div className="container">
+          <div className="row">
+            <div className="col-12">
+              <h4>{props.leaders.errMess}</h4>
+            </div>
+          </div>
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <Stagger in>{RenderLeader(leader)}</Stagger>
+        </div>
+      );
+    }
   });
 
   return (
